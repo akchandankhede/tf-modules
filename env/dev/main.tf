@@ -3,7 +3,7 @@ provider "aws" {
   region  = "us-east-1"
 }
 
-module "vpc" {
+/* module "vpc" {
   source             = "../../module/vpc"
   env                = "dev"
   appname            = "pfmweb"
@@ -12,6 +12,17 @@ module "vpc" {
   private_cidr_block = ["192.168.4.0/24", "192.168.5.0/24", "192.168.6.0/24"]
   availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
   tags = {
+    Owner = "dev-team"
+  }
+} */
+
+module "load-balancer" {
+  source = "../../module/loadbalancer"
+  env = "dev"
+  appname = "crypto"
+  internal = "false"
+  type = "application"
+  tags={
     Owner = "dev-team"
   }
 }
