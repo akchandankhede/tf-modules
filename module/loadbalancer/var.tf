@@ -1,21 +1,21 @@
 variable "internal" {
-    type = string  
+  type = string
 }
 variable "type" {
-    type = string  
+  type = string
 }
 
 variable "appname" {
-    type = string
+  type = string
 }
 
 variable "env" {
-    type = string
+  type = string
 }
 
 variable "tags" {
-    type = map(string)
-    default = {}
+  type    = map(string)
+  default = {}
 
-  
+
 }

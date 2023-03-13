@@ -17,12 +17,12 @@ provider "aws" {
 } */
 
 module "load-balancer" {
-  source = "../../module/loadbalancer"
-  env = "dev"
-  appname = "crypto"
+  source   = "../../module/loadbalancer"
+  env      = "dev"
+  appname  = "crypto"
   internal = "false"
-  type = "application"
-  tags={
+  type     = "application"
+  tags = {
     Owner = "dev-team"
   }
 }
