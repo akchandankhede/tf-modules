@@ -25,62 +25,68 @@ resource "aws_lb" "nlb" {
   tags                       = merge(var.tags, { Name = format("%s-%s-%s", var.appname, var.env, "NLB") })
 }
 
-resource "aws_s3_bucket" "log-bucket" {
-  bucket = "logbucket-${var.appname}-${var.env}-${random_string.random.id}"
-}
-resource "random_string" "random" {
-  length  = 5
-  special = false
-  upper   = false
-}
-
-resource "aws_s3_bucket_policy" "bucket-policy" {
-  bucket = aws_s3_bucket.log-bucket.id
-  policy = data.aws_iam_policy_document.policy.json
-}
-data "aws_iam_policy_document" "policy" {
-  statement {
-    sid       = ""
-    effect    = "Allow"
-    resources = ["arn:aws:s3:::${aws_s3_bucket.log-bucket.id}/${var.appname}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"]
-    actions   = ["s3:PutObject"]
-
-    principals {
-      type        = "AWS"
-      identifiers = [data.aws_elb_service_account.main.arn]
-    }
-  }
-  statement {
-    sid       = ""
-    effect    = "Allow"
-    resources = ["arn:aws:s3:::${aws_s3_bucket.log-bucket.id}/${var.appname}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"]
-    actions   = ["s3:PutObject"]
-
-    condition {
-      test     = "StringEquals"
-      variable = "s3:x-amz-acl"
-      values   = ["bucket-owner-full-control"]
-    }
-    principals {
-      type        = "Service"
-      identifiers = ["delivery.logs.amazonaws.com"]
-    }
-  }
-  statement {
-    sid       = ""
-    effect    = "Allow"
-    resources = ["arn:aws:s3:::${aws_s3_bucket.log-bucket.id}"]
-    actions   = ["s3:GetBucketAcl"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["delivery.logs.amazonaws.com"]
+resource "aws_lb_listener" "http_listener" {
+  count             = var.type == "application" ? 1 : 0
+  load_balancer_arn = aws_lb.alb[0].arn
+  port              = "80"
+  protocol          = "HTTP"
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Fixed response content"
+      status_code  = "200"
     }
   }
 }
-data "aws_caller_identity" "current" {}
-data "aws_elb_service_account" "main" {}
 
-output "account_id" {
-  value = data.aws_caller_identity.current.account_id
+/* resource "aws_lb_listener" "https_listener" {
+  count             = var.type == "application" ? 1 : 0
+  load_balancer_arn = aws_lb.alb[0].arn
+  port              = "443"
+  protocol          = "TLS"target_type = ""
+  certificate_arn   = "arn:aws:iam::187416307283:server-certificate/test_cert_rab3wuqwgja25ct3n4jdj2tzu4"
+  alpn_policy       = "HTTP2Preferred"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.this.arn
+  }
+  depends_on = [aws_lb_target_group.this]
+} */
+
+
+resource "aws_lb_listener_rule" "static" {
+  count             = var.type == "application" ? 1 : 0
+  listener_arn = aws_lb_listener.http_listener[0].arn
+  priority     = 10
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.this.arn
+  }
+  condition {
+    path_pattern {
+      values = ["/mobile/*"]
+    }
+  }
+}
+resource "aws_lb_listener_rule" "laptop" {
+  count             = var.type == "application" ? 1 : 0
+  listener_arn = aws_lb_listener.http_listener[0].arn
+  priority     = 20
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.this.arn
+  }
+  condition {
+    path_pattern {
+      values = ["/laptop/*"]
+    }
+  }
+}
+resource "aws_lb_target_group" "this" {
+  name     = format("%s-%s-%s", var.appname, var.env, "tg")
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = "vpc-0722bf8a285902f28"
 }
