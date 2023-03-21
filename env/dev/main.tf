@@ -25,4 +25,41 @@ module "load-balancer" {
   tags = {
     Owner = "dev-team"
   }
-}
+  listener_rule = {
+    laptop = {
+      priority         = "10"
+      type             = "forward"
+      target_group_arn = "arn:aws:elasticloadbalancing:us-east-1:571479247742:targetgroup/crypto-dev-tg/c864b5d95ee48c73"
+      values           = ["/laptop/*"]
+    }
+
+    mobile = {
+      priority         = "20"
+      type             = "forward"
+      target_group_arn = "arn:aws:elasticloadbalancing:us-east-1:571479247742:targetgroup/crypto-dev-tg/c864b5d95ee48c73"
+      values           = ["/mobile/*"]
+    }
+
+    tv = {
+      priority         = "30"
+      type             = "forward"
+      target_group_arn = "arn:aws:elasticloadbalancing:us-east-1:571479247742:targetgroup/crypto-dev-tg/c864b5d95ee48c73"
+      values           = ["/tv/*"]
+    }
+
+    cloths = {
+      priority         = "40"
+      type             = "forward"
+      target_group_arn = "arn:aws:elasticloadbalancing:us-east-1:571479247742:targetgroup/crypto-dev-tg/c864b5d95ee48c73"
+      values           = ["/cloths/*"]
+    }
+
+    cloudblitz = {
+      priority         = "50"
+      type             = "forward"
+      target_group_arn = "arn:aws:elasticloadbalancing:us-east-1:571479247742:targetgroup/crypto-dev-tg/c864b5d95ee48c73"
+      values           = ["/cloudblitzs/*"]
+    }
+
+  }
+} 

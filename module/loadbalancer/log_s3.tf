@@ -1,5 +1,12 @@
 resource "aws_s3_bucket" "log-bucket" {
   bucket = "logbucket-${var.appname}-${var.env}-${random_string.random.id}"
+   force_destroy = true
+
+        acl    = "private"
+
+        versioning {
+            enabled = true
+        }
 }
 resource "random_string" "random" {
   length  = 5

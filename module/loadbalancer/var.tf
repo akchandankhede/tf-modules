@@ -19,3 +19,7 @@ variable "tags" {
 
 
 }
+variable "listener_rule" {
+  type    = any
+  default = {}
+}

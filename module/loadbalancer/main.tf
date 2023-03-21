@@ -57,33 +57,20 @@ resource "aws_lb_listener" "http_listener" {
 
 
 resource "aws_lb_listener_rule" "static" {
-  count             = var.type == "application" ? 1 : 0
+  for_each     = var.listener_rule
   listener_arn = aws_lb_listener.http_listener[0].arn
-  priority     = 10
+  priority     = each.value.priority
   action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.this.arn
+    type             = each.value.type
+    target_group_arn = each.value.target_group_arn
   }
   condition {
     path_pattern {
-      values = ["/mobile/*"]
+      values = each.value.values
     }
   }
 }
-resource "aws_lb_listener_rule" "laptop" {
-  count             = var.type == "application" ? 1 : 0
-  listener_arn = aws_lb_listener.http_listener[0].arn
-  priority     = 20
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.this.arn
-  }
-  condition {
-    path_pattern {
-      values = ["/laptop/*"]
-    }
-  }
-}
+
 resource "aws_lb_target_group" "this" {
   name     = format("%s-%s-%s", var.appname, var.env, "tg")
   port     = 80
