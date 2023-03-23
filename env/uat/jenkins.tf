@@ -1,7 +1,7 @@
 resource "aws_security_group" "allow_tls" {
   name        = "allow_tls"
   description = "Allow TLS inbound traffic"
-  vpc_id      = "vpc-0726a21ab11d79ec1"
+  vpc_id      = module.vpc.this_vpc
   
 
   ingress {
@@ -60,7 +60,7 @@ data "aws_ami" "ubuntu" {
 resource "aws_instance" "web" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
-  subnet_id = "subnet-0b1e84d4836070eb6"
+  subnet_id = module.vpc.public_subnet[0]
   tags = {
     Name = format("%s-%s-%s", "Jenkins","server","studentapp" )
   }
