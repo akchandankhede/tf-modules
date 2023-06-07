@@ -1,3 +1,10 @@
+
+provider "aws" {
+  region     = "us-east-1"
+  access_key = "AKIATKQJPH5XJWHZKYTP"
+  secret_key = "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"
+}
+
 resource "aws_vpc" "this" {
   cidr_block       = var.vpc_cidr_block
   instance_tenancy = "default"
